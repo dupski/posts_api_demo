@@ -23,7 +23,7 @@ export class Post {
         post_date: string;
     @rev.TextField({ multiLine: true, maxLength: 2000 })
         body: string;
-    @rev.RelatedModel({ model: 'User', label: 'Author' })
+    @rev.RelatedModel({ model: 'User' })
         user: User;
 
     constructor(data?: Partial<Post>) {
@@ -44,7 +44,7 @@ export class Comment {
         comment_date: string;
     @rev.TextField({ multiLine: true, maxLength: 500 })
         comment: string;
-    @rev.RelatedModel({ model: 'User', label: 'Author' })
+    @rev.RelatedModel({ model: 'User' })
         user: User;
 
     constructor(data?: Partial<Comment>) {
@@ -59,6 +59,34 @@ modelManager.register(Post);
 modelManager.register(Comment);
 
 export const api = new ModelApiManager(modelManager);
-api.register(User, { operations: ['read'] })
+api.register(User, { operations: ['read', 'create'] })
 api.register(Post, { operations: ['read', 'create', 'update', 'remove'] })
 api.register(Comment, { operations: ['read', 'create', 'update', 'remove'] })
+
+export async function createDemoData() {
+    const user1 = (
+        await modelManager.create(new User({
+            full_name: 'Russell Briggs',
+            email: 'russ@russellbriggs.co'
+        }))
+    ).result;
+
+    const user2 = (
+        await modelManager.create(new User({
+            full_name: 'Lauren Smith',
+            email: 'lauren@smith.co.nz'
+        }))
+    ).result;
+
+    await modelManager.create(new Post({
+        post_date: '2018-05-14',
+        body: 'This is a cool post created with RevJS',
+        user: user1
+    }));
+
+    await modelManager.create(new Post({
+        post_date: '2018-05-17',
+        body: 'Laurens First Post',
+        user: user2
+    }));
+}

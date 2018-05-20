@@ -7,6 +7,7 @@ import * as KoaBody from 'koa-bodyparser';
 import { jsonLog } from 'koa-json-log';
 import { config } from './config';
 import { registerRoutes } from './routes';
+import { createDemoData } from './models';
 
 const app = new Koa();
 
@@ -18,3 +19,7 @@ registerRoutes(app);
 app.listen(config.port);
 
 console.log(`Server is running at http://localhost:${config.port}/`);
+
+createDemoData().then(() => {
+    console.log('Demo Data Loaded!')
+});
